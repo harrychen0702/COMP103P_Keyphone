@@ -16,11 +16,13 @@ angular.module('app.controllers', [])
         };
 })
 
-.controller('startCtrl', function($scope) {
-    // nothing to do here...
+.controller('startCtrl', function($scope, $window) {
+    $scope.size = $window.innerWidth;
+    $scope.size2= $window.outerWidth;
 })
 
 .controller('dailyUseCtrl', function($scope, $ionicPlatform, $audioPlayer, $localstorage, $key_data) {
+    // TODO: dailyUse time mesurer is not working
     var data;
     var session;
     $scope.$on('$ionicView.enter', function(){
@@ -168,7 +170,7 @@ angular.module('app.controllers', [])
          */
         if($scope.nextModal) {
             if(c == first){
-                $audioPlayer.play(c, c);
+                $audioPlayer.play(c.toLowerCase(), c.toLowerCase());
                 return;
             }
         }
@@ -482,6 +484,8 @@ angular.module('app.controllers', [])
     // Day
     $scope.pracByDayOptions =
         {
+            responsive: true,
+            maintainAspectRatio: true,
             scaleShowLine : true,
             scaleShowLabels : false,
             angleLineWidth : 1,
@@ -492,8 +496,7 @@ angular.module('app.controllers', [])
     $scope.pracByDayData = {
         labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
         datasets :
-        [
-          {
+        [{
           data: $scope.PractiseByDay,
           fillColor: "rgba(186, 238, 241, 0.2)",
           strokeColor: "rgba(220,220,220,0.8)",
@@ -501,13 +504,14 @@ angular.module('app.controllers', [])
           pointStrokeColor: "#3181d4",
           pointHighlightFill: "#124af1",
           pointHighlightStroke: "rgba(110, 48, 48, 0.8)",
-          }
-        ]
+          }]
         };
 
     // Bar Chart for started/finished
     // Practises
-    $scope.barOptions = {};
+    $scope.barOptions = {
+
+    };
     $scope.barChart = {
         labels : ["Started","Finished"],
         datasets :
@@ -520,6 +524,8 @@ angular.module('app.controllers', [])
     // daily use by day distribution
     $scope.useByDayOptions =
         {
+            responsive: true,
+            maintainAspectRatio: true,
             scaleShowLine : true,
             scaleShowLabels : false,
             angleLineWidth : 1,
@@ -543,7 +549,10 @@ angular.module('app.controllers', [])
     };
     // Daily Usedata
     // Barchart for all the caracters
-    $scope.charStatisticsOpt = {};
+    $scope.charStatisticsOpt = {
+        responsive: true,
+        maintainAspectRatio: true,
+    };
 
     // an Array holding all chars from A - Z
     // for the label of the barchart
