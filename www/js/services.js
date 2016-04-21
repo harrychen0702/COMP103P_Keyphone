@@ -1,6 +1,273 @@
+/* Written by Janos Potecki
+ * University College London Term 2/3 - 2015/2016
+ * for Course: COMP103P
+ * www.github.com/jpotecki
+ * janos dot potecki dot 15 et ucl dot ac dot uk
+ */
 angular.module('app.services', [])
 
-// TODO: collect data on every click and send it AWS endpoint
+.factory('$key_data', [function($scope){
+        /* Factory Data
+         *
+         * createData : function()
+         *  Creates an obj Data
+         *      {
+         *          obj     gamesArchive
+         *          obj[]   dailyUseSessions
+         *      }
+         * getNumDailyUse : function(data)
+         *  Return the total amount of how often
+         *  the user started practising the
+         *  dailyUse
+         *
+         * getTimeDailyUse : function(data) :
+         *  Returns the total time the user spend
+         *  practising the dailyUse
+         *
+         * getDailyUseArr : function(data)
+         *  returns an obj[] which contains details
+         *  for each day practising daily use
+         *
+         * getDailyUseCharStatistics : function(data)
+         *  Retunrs an obj[] where the number of
+         *  clicks per character are listed
+         *
+         * getNumPractiseStarted : function(data)
+         *  returns the total amount of practises the
+         *  user started
+         *
+         * getNumPractiseFinished : function(data)
+         *  returns the total amount of practises the
+         *  user started but hasn't finished
+         *
+         * getMostPractisedWord : function(data)
+         *  returns an string[] word, which contains
+         *  the mostly practised words, eg.:
+         *      if the data contains hat::3 , fish::3,
+         *                           tiger :: 2, egg::1
+         *  it returns [hat, fish]
+         *
+         * getTopCorrectWord : function(data)
+         *  returns an array with the words, which where
+         *  guessed the most time correct
+         *
+         * getTopWrongWord : function(data)
+         *  returns an array with the most incorrect words
+         *
+         * getPractiseByDay : function()
+         *  returns an int[] where arr[0] is sunday
+         *  and arr[1] monday .. arr[6] saturday
+         *
+         * addGame : function (obj game, obj data) :
+         *  takes a game and adds it to the obj data
+         *  and returns the updated data obj
+         *
+         * getDailyUseCharStatistics : function(data)
+         *  same as getPractiseByDay just for the daily
+         *  uses.
+         *
+         * addDailyPractise : function (data, practise)
+         *  adds a daily practise to the dataset and
+         *  returns the dataset
+         *
+         * startDailyPractise : function (data)
+         *  Increases the internal counter for
+         *  the daily practises
+         */
+
+         //TODO return the statistics of (in)correct said words
+         return {
+             createData : function() {
+                 var data = {};
+                 data.gamesArchive = [];
+                 data.dailyUseSessions = [];
+                 return data;
+             },
+             createSession : function (){
+                 var practise = {};
+                 practise.begin = new Date();
+                 practise.end = new Date();
+                 // create an array for each char
+                 practise.char = Array.apply(null, Array(26)).map(function (x, i){return 0});
+                 return practise;
+             },
+             updateDailyUse : function (data, session){
+                 var index = data.dailyUseSessions.length -1;
+                 data.dailyUseSessions[index] = session;
+                 return data;
+             },
+             getNumDailyUse : function(data){
+                return data.dailyUseSessions.length;
+             },
+             getTimeDailyUse : function(data) {
+                //return data.timeDailyUse;
+             },
+             getTimeDailyUseMinutes : function(data) {
+                var time = 0;
+                sessions = data.dailyUseSessions;
+                for(var i = 0; i < sessions.length; i++){
+                    if(sessions[i].end == 0)
+                        continue;
+                    var begin = new Date (Date.parse(sessions[i].begin)).getTime();
+                    var end = new Date(Date.parse(sessions[i].end)).getTime();
+                    time += end - begin;
+                }
+                time /= 1000 * 60;
+                return Math.floor(time * 100) / 100;
+             },
+             getDailyUseArr : function(data) {
+                 return data.dailyUseSessions;
+             },
+             getDailyUseCharStatistics : function(data) {
+                 var arr = []
+                 var sessions = data.dailyUseSessions;
+                 for(var i = 0; i < 26; i++){
+                     arr[i] = 0;
+                     for(var j = 0; j < sessions.length; j++){
+                         arr[i] += sessions[j].char[i];
+                     }
+                 }
+                 return arr;
+             },
+             getNumPractiseStarted : function(data){
+                 return data.gamesArchive.length;
+             },
+             getNumPractiseFinished : function(data){
+                var counter = 0;
+                for (var i = 0, len = data.gamesArchive.length; i < len; i++){
+                    if(data.gamesArchive[i].finished){
+                        counter++;
+                    }
+                }
+                return counter;
+             },
+             getMostPractisedWord : function(data){
+                 var dic = {};
+                 games = data.gamesArchive;
+                 for(var i = 0; i < games.length; i++){
+                     words = games[i].words;
+                     for(var j = 0; j < words.length; j++){
+                         var w = words[j];
+                         if (w.played){
+                             dic[w.word] ? dic[w.word]++ : dic[w.word] = 1;
+                         }
+                     }
+                 }
+                 var arr = [];
+                 for(var key in dic){
+                     arr.push({num :dic[key], word : key});
+                 }
+                 arr.sort(function(x, y){
+                     return y.num - x.num;
+                 });
+                 string_arr = []
+                 for(i = 0; i < arr.length; i++){
+                     if(arr[0].num != arr[i].num)
+                        break;
+                    string_arr.push(arr[i].word);
+                 }
+                 return string_arr;
+             },
+             getTopCorrectWord : function(data) {
+                 var dic = {};
+                 games = data.gamesArchive;
+                 for(var i = 0; i < games.length; i++){
+                     words = games[i].words;
+                     for(var j = 0; j < words.length; j++){
+                         var w = words[j];
+                         if (w.solved){
+                             dic[w.word] ? dic[w.word]++ : dic[w.word] = 1;
+                         }
+                     }
+                 }
+                 var arr = [];
+                 for(var key in dic){
+                     arr.push({num :dic[key], word : key});
+                 }
+                 arr.sort(function(x, y){
+                     return y.num - x.num;
+                 });
+                 string_arr = []
+                 for(i = 0; i < arr.length; i++){
+                     if(arr[0].num != arr[i].num)
+                        break;
+                    string_arr.push(arr[i].word);
+                 }
+                 return string_arr;
+             },
+             getTopWrongWord : function(data){
+                 var dic = {};
+                 games = data.gamesArchive;
+                 for(var i = 0; i < games.length; i++){
+                     words = games[i].words;
+                     for(var j = 0; j < words.length; j++){
+                         var w = words[j];
+                         if (!w.solved && w.played){
+                             dic[w.word] ? dic[w.word]++ : dic[w.word] = 1;
+                         }
+                     }
+                 }
+                 var arr = [];
+                 for(var key in dic){
+                     arr.push({num :dic[key], word : key});
+                 }
+                 arr.sort(function(x, y){
+                     return y.num - x.num;
+                 });
+                 string_arr = []
+                 for(i = 0; i < arr.length; i++){
+                     if(arr[0].num != arr[i].num)
+                        break;
+                    string_arr.push(arr[i].word);
+                 }
+                 return string_arr;
+             },
+             getPractiseByDay : function(data){
+                 var week = [0,0,0,0,0,0,0];
+                 var games = data.gamesArchive;
+                 for(var i = 0; i < games.length; i++){
+                    var day = new Date(Date.parse(games[i].startTime)).getDay();
+                    week[day]++;
+                 }
+                 return week;
+             },
+             getDailyUseByDay : function(data){
+                 var week = [0,0,0,0,0,0,0];
+                 var uses = data.dailyUseSessions;
+                 for(var i = 0; i < uses.length; i++){
+                    var day = new Date(Date.parse(uses[i].begin)).getDay();
+                    week[day]++;
+                 }
+                 return week;
+             },
+             addDailyUse : function(data, dayuse){
+                 data.dailyUseSessions.push(dayuse);
+                 dayuse.end = new Date();
+                 begin = dayuse.begin.getTime();
+                 end = dayuse.end.getTime();
+                 data.timeDailyUse += end - begin;
+                 return data;
+             },
+             updateGame : function(data, game){
+                 game.endTime = new Date();
+                 var index = game.index;
+                 if(index >= 0){
+                     data.gamesArchive[index] = game;
+                 } else {
+                     game.index =  data.gamesArchive.length;
+                     data.gamesArchive.push(game);
+                 }
+                 console.log(data);
+                 return data;
+             },
+             addGame : function(data, game){
+                 data.gamesArchive.push(game);
+                 // return data and the index of the
+                 // game
+                 return [data, data.gamesArchive.length -1];
+             }
+         }
+}])
 
 .factory('WordSetup', [function($scope){
     /* Factory WordSetup
@@ -110,13 +377,17 @@ angular.module('app.services', [])
     createGameData: function(list) {
       var gameData = {};
       gameData.id = list._id;
-      gameData.startTime = (new Date).getTime();
+      // when created, save here the index in the
+      // data arr, in order to update the correct
+      // game
+      gameData.index;
+      gameData.startTime = new Date();
       gameData.endTime;
       gameData.name = list.name;
       gameData.activeWords = list.words.length;
       gameData.finished = false;
       gameData.words = [];
-      for(var i = 0; i<list.words.length; i++) {
+      for(var i = 0; i < list.words.length; i++) {
         w = {};
         w.time = 0;
         w.word = list.words[i];
@@ -213,9 +484,22 @@ angular.module('app.services', [])
    *                string name
    *                string[] words
    *            }
+   *    getData : function()
+   *        Takes the data out from the database,
+   *        if there doesn't exist any, it creates
+   *        one and returns it
+   *
+   *    saveData : function(data)
+   *        saves the data object into the database
    *
    *    getList: function(int id)
    *        Returns the List with the ID or an empty obj
+   *
+   *    getCurrentGame : function() :
+   *        Returns the current practiseSession
+   *
+   *    saveCurrentGame : function(game)
+   *        saves the current Game in the db
    */
   return {
     setObject: function(key, value) {
@@ -234,11 +518,23 @@ angular.module('app.services', [])
                             words.push(item);
                     }
                 } catch (err) {
-                    console.warn("not a json: [" + localStorage.getItem(i) + "] ...deleted");
+                    //console.warn("not a json: [" + localStorage.getItem(i) + "] ...deleted");
                     localStorage.removeItem(i);
                 }
       }
       return words;
+    },
+    getData : function() {
+        return JSON.parse($window.localStorage['keyphone_data'] || '{}');
+    },
+    saveData : function(data){
+        $window.localStorage['keyphone_data'] = JSON.stringify(data);
+    },
+    getCurrentGame : function() {
+        return JSON.parse($window.localStorage['current_game'] || '{}');
+    },
+    saveCurrentGame : function(game){
+        $window.localStorage['current_game'] = JSON.stringify(game);
     },
     getList: function(id) {
       return JSON.parse($window.localStorage[id] || '{}');

@@ -1,21 +1,32 @@
-<ion-view title="Summary">
+
+</ion-view>
+<ion-view title="Summary" class="pane">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+    <a ui-sref="app.start" class="button button-icon ion-home"> </a>
+</ion-nav-buttons>
     <ion-content overflow-scroll="true" padding="true" class="has-header">
-        <div>
+    <div class="space5"></div>
+        <div class="color">
             Correct: {{correct}}
         </div>
-        <div>
+        <div class="space5"></div>
+        <div class="color">
             Correct with help: {{withHelp}}
         </div>
-        <div>
+        <div class="space5"></div>
+        <div class="color">
+
             Incorrect: {{wrong}}
         </div>
-
-        <a class="button button-calm button-block button-small" ng-click="redo()" >Redo</a>
-        <a class="button button-calm button-block button-small" ng-click="otherList()" >Other List</a>
-        <a class="button button-calm button-block button-small" ng-click="home()" >Menu</a>
+        <div class="spacetop2"></div>
+        <div id="wrapper2">
+        <a class="liststyle button-block " ng-click="redo()" >Redo</a>
+        <a class="liststyle button-block " ng-click="otherList()" >Other List</a>
+        
+</div>
         <form class="list"></form>
     </ion-content>
 </ion-view>
