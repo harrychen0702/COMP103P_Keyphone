@@ -106,7 +106,6 @@ angular.module('app.services', [])
                 var time = 0;
                 sessions = data.dailyUseSessions;
                 for(var i = 0; i < sessions.length; i++){
-                    console.log(sessions[i].end);
                     if(sessions[i].end == 0)
                         continue;
                     var begin = new Date (Date.parse(sessions[i].begin)).getTime();
