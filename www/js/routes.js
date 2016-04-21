@@ -1,3 +1,9 @@
+/* Written by Janos Potecki
+ * University College London Term 2/3 - 2015/2016
+ * for Course: COMP103P
+ * www.github.com/jpotecki
+ * janos dot potecki dot 15 et ucl dot ac dot uk
+ */
 angular.module('app.routes', [])
 
 .config(function($stateProvider, $urlRouterProvider) {
@@ -14,6 +20,16 @@ angular.module('app.routes', [])
       templateUrl: 'templates/menu.html',
       controller: 'AppCtrl',
   })
+  .state('app.statistcs', {
+        cache: false,
+        url: '/statistics',
+        views : {
+            'menuContent' : {
+                templateUrl: 'templates/statistics.html',
+                controller: 'StatCtrl'
+            }
+        }
+  })
 
   .state('app.start', {
     url: '/start',
@@ -26,6 +42,7 @@ angular.module('app.routes', [])
   })
 
   .state('app.dailyUse', {
+    cache: false,
     url: '/dailyUse',
     views : {
         'menuContent' : {
@@ -107,6 +124,7 @@ angular.module('app.routes', [])
 
   .state('app.speakCheck', {
       url: '/speakCheck',
+      params: { id : null, },
       views : {
           'menuContent' : {
               templateUrl : 'templates/speakCheck.html',
@@ -121,6 +139,16 @@ angular.module('app.routes', [])
           'menuContent' : {
               templateUrl : 'templates/summary.html',
               controller : 'summaryCtrl'
+          }
+      }
+  })
+
+ .state('app.manage', {
+      url : '/manage',
+      views : {
+          'menuContent' : {
+              templateUrl : 'templates/manage.html',
+              controller : 'manageCtrl'
           }
       }
   })
